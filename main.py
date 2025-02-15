@@ -5,15 +5,18 @@ import paramiko
 HOST = "0.0.0.0"
 PORT = 2222
 PASSWORD_AUTH = {"user": "password"}
-AUTHORIZED_KEYS = ["ssh-rsa AAAAB3... user@host"]
+# AUTHORIZED_KEYS = ["ssh-rsa AAAAB3... user@host"]
 HOST_KEY = paramiko.RSAKey(filename="server.pem")
 
 class Server(paramiko.ServerInterface):
 	def __init__(self):
 		self.event = threading.Event()
 
+	def get_banner(self):
+		return ('=== Here is henSSH ===\n', 'en-US')
+
 	def get_allowed_auths(self, username):
-		return 'publickey'
+		return 'publickey,password'
 
 	def check_auth_password(self, username, password):
 		if PASSWORD_AUTH.get(username) == password:
@@ -21,6 +24,7 @@ class Server(paramiko.ServerInterface):
 		return paramiko.AUTH_FAILED
 
 	def check_auth_publickey(self, username, key):
+		print('Get a KEY from a client.')
 		return paramiko.AUTH_SUCCESSFUL
 		# return paramiko.AUTH_FAILED
 
